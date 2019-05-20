@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package file;
+package downloader;
 
 message FileRequest {
   string name = 1;
