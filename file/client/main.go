@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	pb "github.com/g-hyoga/gRPC-nyumon/downloader/proto"
+	pb "github.com/g-hyoga/gRPC-nyumon/file/proto"
 	"google.golang.org/grpc"
 )
 

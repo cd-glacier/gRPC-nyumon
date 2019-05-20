@@ -5,13 +5,13 @@ import (
 	"os"
 	"path/filepath"
 
-	pb "github.com/g-hyoga/gRPC-nyumon/downloader/proto"
+	pb "github.com/g-hyoga/gRPC-nyumon/file/proto"
 )
 
 type fileService struct{}
 
 func (f *fileService) Download(req *pb.FileRequest, stream pb.FileService_DownloadServer) error {
-	fp := filepath.Join("./downloader/resource", req.GetName())
+	fp := filepath.Join("./file/resource", req.GetName())
 
 	fs, err := os.Open(fp)
 	if err != nil {
