@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	pb "github.com/g-hyoga/gRPC-nyumon/file/downloader"
+	"github.com/g-hyoga/gRPC-nyumon/file/downloader"
 	"google.golang.org/grpc"
 )
 
@@ -26,13 +26,13 @@ func main() {
 	}
 	defer conn.Close()
 
-	c := pb.NewFileServiceClient(conn)
+	c := downloader.NewFileServiceClient(conn)
 	name := os.Args[1]
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	stream, err := c.Download(ctx, &pb.FileRequest{Name: name})
+	stream, err := c.Download(ctx, &downloader.FileRequest{Name: name})
 	if err != nil {
 		log.Fatalf("could not downlaod: %s\n", err)
 	}

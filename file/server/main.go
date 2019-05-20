@@ -4,7 +4,8 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/g-hyoga/gRPC-nyumon/file/downloader"
+	"github.com/g-hyoga/gRPC-nyumon/file/downloader"
+	"github.com/g-hyoga/gRPC-nyumon/file/uploader"
 	"google.golang.org/grpc"
 )
 
@@ -20,7 +21,8 @@ func main() {
 	}
 
 	srv := grpc.NewServer()
-	pb.RegisterFileServiceServer(srv, &fileService{})
+	downloader.RegisterFileServiceServer(srv, &downloadService{})
+	uploader.RegisterFileServiceServer(srv, &uploadService{})
 
 	log.Printf("start server on port%s\n", port)
 
