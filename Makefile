@@ -13,5 +13,10 @@ echo-client: ## start echo client and send "test"
 file-protoc: ## generate proto code
 	protoc --proto_path=./downloader/proto --go_out=plugins=grpc:./downloader/proto/ ./downloader/proto/file.proto
 
+file-server: ## start file grpc server
+	go run ./downloader/server/
+
+file-client: ## start file client
+
 help: ## show help to make
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
