@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/g-hyoga/gRPC-nyumon/chat"
 	"github.com/g-hyoga/gRPC-nyumon/downloader"
 	"github.com/g-hyoga/gRPC-nyumon/echo"
 	"github.com/g-hyoga/gRPC-nyumon/uploader"
@@ -14,7 +15,7 @@ const port = ":50051"
 
 func main() {
 	log.SetFlags(0)
-	log.SetPrefix("[file] ")
+	log.SetPrefix("[gRPC server] ")
 
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
@@ -25,6 +26,7 @@ func main() {
 	echo.RegisterEchoServiceServer(srv, &echoService{})
 	downloader.RegisterFileServiceServer(srv, &downloadService{})
 	uploader.RegisterFileServiceServer(srv, &uploadService{})
+	chat.RegisterChatServiceServer(srv, &chatService{})
 
 	log.Printf("start server on port%s\n", port)
 

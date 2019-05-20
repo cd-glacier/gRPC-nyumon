@@ -1,23 +1,26 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"flag"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"time"
 
+	cpb "github.com/g-hyoga/gRPC-nyumon/chat"
 	"github.com/g-hyoga/gRPC-nyumon/downloader"
-	e "github.com/g-hyoga/gRPC-nyumon/echo"
+	epb "github.com/g-hyoga/gRPC-nyumon/echo"
 	"github.com/g-hyoga/gRPC-nyumon/uploader"
 	"google.golang.org/grpc"
 )
 
 func init() {
 	log.SetFlags(0)
-	log.SetPrefix("[gRPC] ")
+	log.SetPrefix("[gRPC client] ")
 }
 
 func main() {
@@ -25,7 +28,7 @@ func main() {
 
 	mode := flag.String("mode", "download", "echo,downoload,upload")
 	message := flag.String("message", "hello~", "hello gRPC world")
-	filename := flag.String("filename", "resource.txt", "--mode=resource.txt")
+	name := flag.String("name", "resource.txt", "--mode=resource.txt")
 	flag.Parse()
 
 	conn, err := grpc.Dial(target, grpc.WithInsecure())
@@ -38,18 +41,20 @@ func main() {
 	case "echo":
 		echo(conn, *message)
 	case "download":
-		download(conn, *filename)
+		download(conn, *name)
 	case "upload":
-		upload(conn, *filename)
+		upload(conn, *name)
+	case "chat":
+		chat(conn, *name)
 	}
 }
 
 func echo(conn *grpc.ClientConn, message string) {
-	client := e.NewEchoServiceClient(conn)
+	client := epb.NewEchoServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	r, err := client.Echo(ctx, &e.EchoRequest{Message: message})
+	r, err := client.Echo(ctx, &epb.EchoRequest{Message: message})
 	if err != nil {
 		log.Println(err)
 	}
@@ -118,4 +123,38 @@ func upload(conn *grpc.ClientConn, name string) {
 
 	res, err := stream.CloseAndRecv()
 	log.Printf("done %d bytes\n", res.GetSize())
+}
+
+func chat(conn *grpc.ClientConn, name string) {
+	c := cpb.NewChatServiceClient(conn)
+
+	stream, err := c.Connect(context.Background())
+	if err != nil {
+		log.Fatalf("could not connect: %s", err)
+	}
+
+	go func() {
+		for {
+			res, err := stream.Recv()
+			if err == io.EOF {
+				return
+			}
+			if err != nil {
+				log.Fatalf("Failed to recv: %v", err)
+			}
+			fmt.Println(fmt.Sprintf("[%s] %s",
+				res.GetName(), res.GetMessage()))
+		}
+	}()
+
+	for {
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
+		msg := scanner.Text()
+		if msg == ":quit" {
+			stream.CloseSend()
+			return
+		}
+		stream.Send(&cpb.Post{Name: name, Message: msg})
+	}
 }
