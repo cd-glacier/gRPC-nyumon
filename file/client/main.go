@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"io"
 	"io/ioutil"
 	"log"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/g-hyoga/gRPC-nyumon/file/downloader"
+	"github.com/g-hyoga/gRPC-nyumon/file/uploader"
 	"google.golang.org/grpc"
 )
 
@@ -20,14 +22,26 @@ func init() {
 func main() {
 	target := "localhost:50051"
 
+	mode := flag.String("mode", "download", "--mode=downoload")
+	filename := flag.String("filename", "resource.txt", "--mode=resource.txt")
+	flag.Parse()
+
 	conn, err := grpc.Dial(target, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %s\n", err)
 	}
 	defer conn.Close()
 
+	switch *mode {
+	case "download":
+		download(conn, *filename)
+	case "upload":
+		upload(conn, *filename)
+	}
+}
+
+func download(conn *grpc.ClientConn, name string) {
 	c := downloader.NewFileServiceClient(conn)
-	name := os.Args[1]
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -51,4 +65,40 @@ func main() {
 	}
 
 	ioutil.WriteFile(name, blob, 0644)
+}
+
+func upload(conn *grpc.ClientConn, name string) {
+	c := uploader.NewFileServiceClient(conn)
+
+	fs, err := os.Open(name)
+	if err != nil {
+		log.Fatalf("could not open file %s\n", err)
+	}
+	defer fs.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stream, err := c.Upload(ctx)
+	if err != nil {
+		log.Fatalf("could not upload file: %s\n", err)
+	}
+
+	buf := make([]byte, 1000*1024)
+	for {
+		n, err := fs.Read(buf)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("could not read file %s\n", err)
+		}
+		stream.Send(&uploader.FileRequest{
+			Name: name,
+			Data: buf[:n],
+		})
+	}
+
+	res, err := stream.CloseAndRecv()
+	log.Printf("done %d bytes\n", res.GetSize())
 }
