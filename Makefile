@@ -16,7 +16,8 @@ file-protoc: ## generate proto code
 file-server: ## start file grpc server
 	go run ./downloader/server/
 
-file-client: ## start file client
+file-client: ## start file client and get "resource.txt"
+	go run ./downloader/client/ resource.txt
 
 help: ## show help to make
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
