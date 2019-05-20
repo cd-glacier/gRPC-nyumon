@@ -10,20 +10,21 @@ import (
 	"time"
 
 	"github.com/g-hyoga/gRPC-nyumon/downloader"
+	e "github.com/g-hyoga/gRPC-nyumon/echo"
 	"github.com/g-hyoga/gRPC-nyumon/uploader"
 	"google.golang.org/grpc"
 )
 
 func init() {
 	log.SetFlags(0)
-	log.SetPrefix("[file] ")
+	log.SetPrefix("[gRPC] ")
 }
 
 func main() {
 	target := "localhost:50051"
 
 	mode := flag.String("mode", "download", "echo,downoload,upload")
-	// message := flag.String("message", "hello~", "hello gRPC world")
+	message := flag.String("message", "hello~", "hello gRPC world")
 	filename := flag.String("filename", "resource.txt", "--mode=resource.txt")
 	flag.Parse()
 
@@ -34,11 +35,26 @@ func main() {
 	defer conn.Close()
 
 	switch *mode {
+	case "echo":
+		echo(conn, *message)
 	case "download":
 		download(conn, *filename)
 	case "upload":
 		upload(conn, *filename)
 	}
+}
+
+func echo(conn *grpc.ClientConn, message string) {
+	client := e.NewEchoServiceClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	r, err := client.Echo(ctx, &e.EchoRequest{Message: message})
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Println(r.GetMessage())
 }
 
 func download(conn *grpc.ClientConn, name string) {

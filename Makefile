@@ -1,21 +1,16 @@
-.PHONY: help
+.PHONY: help server echo
 .DEFAULT_GOAL := help
 
-echo-protoc: ## generate proto code
-	protoc --proto_path=./echo/proto --go_out=plugins=grpc:./echo/proto/ ./echo/proto/echo.proto
-
-echo-server: ## start echo grpc server
-	go run ./echo/server/
-
-echo-client: ## start echo client and send "test"
-	go run ./echo/client/ test
-
-file-protoc: ## generate proto code
+protoc: ## generate proto code
+	protoc --proto_path=./echo --go_out=plugins=grpc:./echo/ ./echo/echo.proto
 	protoc --proto_path=./downloader --go_out=plugins=grpc:./downloader/ ./downloader/downloader.proto
 	protoc --proto_path=./uploader --go_out=plugins=grpc:./uploader/ ./uploader/uploader.proto
 
-file-server: ## start file grpc server
+server: ## start file grpc server
 	go run ./server/
+
+echo: ## echo "hello"
+	go run ./client/ --mode=echo --message="hello"
 
 file-download: ## download "resource.txt"
 	go run ./client/ --mode=download --filename=resource.txt

@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"github.com/g-hyoga/gRPC-nyumon/downloader"
+	"github.com/g-hyoga/gRPC-nyumon/echo"
 	"github.com/g-hyoga/gRPC-nyumon/uploader"
 	"google.golang.org/grpc"
 )
@@ -21,6 +22,7 @@ func main() {
 	}
 
 	srv := grpc.NewServer()
+	echo.RegisterEchoServiceServer(srv, &echoService{})
 	downloader.RegisterFileServiceServer(srv, &downloadService{})
 	uploader.RegisterFileServiceServer(srv, &uploadService{})
 
