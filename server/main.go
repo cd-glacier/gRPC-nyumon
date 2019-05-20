@@ -4,8 +4,8 @@ import (
 	"log"
 	"net"
 
-	"github.com/g-hyoga/gRPC-nyumon/file/downloader"
-	"github.com/g-hyoga/gRPC-nyumon/file/uploader"
+	"github.com/g-hyoga/gRPC-nyumon/downloader"
+	"github.com/g-hyoga/gRPC-nyumon/uploader"
 	"google.golang.org/grpc"
 )
 

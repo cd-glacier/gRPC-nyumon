@@ -9,8 +9,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/g-hyoga/gRPC-nyumon/file/downloader"
-	"github.com/g-hyoga/gRPC-nyumon/file/uploader"
+	"github.com/g-hyoga/gRPC-nyumon/downloader"
+	"github.com/g-hyoga/gRPC-nyumon/uploader"
 	"google.golang.org/grpc"
 )
 
@@ -22,7 +22,8 @@ func init() {
 func main() {
 	target := "localhost:50051"
 
-	mode := flag.String("mode", "download", "--mode=downoload")
+	mode := flag.String("mode", "download", "echo,downoload,upload")
+	// message := flag.String("message", "hello~", "hello gRPC world")
 	filename := flag.String("filename", "resource.txt", "--mode=resource.txt")
 	flag.Parse()
 

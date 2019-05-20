@@ -7,14 +7,14 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/g-hyoga/gRPC-nyumon/file/downloader"
-	"github.com/g-hyoga/gRPC-nyumon/file/uploader"
+	"github.com/g-hyoga/gRPC-nyumon/downloader"
+	"github.com/g-hyoga/gRPC-nyumon/uploader"
 )
 
 type downloadService struct{}
 
 func (s *downloadService) Download(req *downloader.FileRequest, stream downloader.FileService_DownloadServer) error {
-	fp := filepath.Join("./file/resource", req.GetName())
+	fp := filepath.Join("./resource", req.GetName())
 
 	fs, err := os.Open(fp)
 	if err != nil {
@@ -62,7 +62,7 @@ func (s *uploadService) Upload(stream uploader.FileService_UploadServer) error {
 		blob = append(blob, c.GetData()...)
 	}
 
-	fp := filepath.Join("./file/resource", name)
+	fp := filepath.Join("./resource", name)
 	ioutil.WriteFile(fp, blob, 0644)
 	stream.SendAndClose(&uploader.FileResponse{Size: int64(len(blob))})
 
