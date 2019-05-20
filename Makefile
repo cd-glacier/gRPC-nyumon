@@ -11,8 +11,8 @@ echo-client: ## start echo client and send "test"
 	go run ./echo/client/ test
 
 file-protoc: ## generate proto code
-	protoc --proto_path=./file/proto --go_out=plugins=grpc:./file/proto/ ./file/proto/downloader.proto
-	protoc --proto_path=./file/proto --go_out=plugins=grpc:./file/proto/ ./file/proto/uploader.proto
+	protoc --proto_path=./file/downloader --go_out=plugins=grpc:./file/downloader/ ./file/downloader/downloader.proto
+	protoc --proto_path=./file/uploader --go_out=plugins=grpc:./file/uploader/ ./file/uploader/uploader.proto
 
 file-server: ## start file grpc server
 	go run ./file/server/

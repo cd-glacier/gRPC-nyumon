@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/g-hyoga/gRPC-nyumon/file/proto"
+	pb "github.com/g-hyoga/gRPC-nyumon/file/downloader"
 	"google.golang.org/grpc"
 )
 

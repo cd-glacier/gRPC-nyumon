@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	pb "github.com/g-hyoga/gRPC-nyumon/file/proto"
+	pb "github.com/g-hyoga/gRPC-nyumon/file/downloader"
 )
 
 type fileService struct{}
